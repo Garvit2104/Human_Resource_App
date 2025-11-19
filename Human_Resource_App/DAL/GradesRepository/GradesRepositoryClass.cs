@@ -17,5 +17,11 @@ namespace Human_Resource_App.DAL.GradesRepository
             var data = context.Grades.ToList();
             return data;
         }
+
+        public Grade GetGradeById(int id)
+        {
+            var data = context.Grades.Find(id);
+            return data;
+        }
     }
 }

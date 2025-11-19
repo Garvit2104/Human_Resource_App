@@ -1,5 +1,6 @@
 ﻿using Human_Resource_App.BLL.GradesService;
 using Human_Resource_App.BLL.UserServices;
+using Human_Resource_App.DAL.GradesHistoryRepository;
 using Human_Resource_App.Data;
 using Human_Resource_App.DTOs.UsersDTO;
 using Microsoft.AspNetCore.Http;
@@ -12,11 +13,13 @@ namespace Human_Resource_App.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IUserService userService;
+        private readonly IGradesHistory gradeHistoryRepo;
         private readonly HRDbContext context;
-        public UsersController(IUserService userService, HRDbContext context)
+        public UsersController(IUserService userService, HRDbContext context, IGradesHistory gradeHistoryRepo)
         {
             this.userService = userService;
             this.context = context;
+            this.gradeHistoryRepo = gradeHistoryRepo;
         }
 
         [HttpPost("employee")]
@@ -52,9 +55,9 @@ namespace Human_Resource_App.Controllers
             {
                 return NotFound($"Employee with ID {id} not found.");
             }
+            gradeHistoryRepo.DeleteAllGrades(id);
 
             context.Users.Remove(employee);
-
             context.SaveChanges();
             return Ok($"Employee with ID {id} deleted successfully.");
 

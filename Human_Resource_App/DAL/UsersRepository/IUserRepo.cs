@@ -4,7 +4,7 @@ namespace Human_Resource_App.DAL.UsersRepository
 {
     public interface IUserRepo
     {
-        List<User> AddEmployee(User user);
+        User AddEmployee(User user);
 
         List<User> GetAllEmployee();
 

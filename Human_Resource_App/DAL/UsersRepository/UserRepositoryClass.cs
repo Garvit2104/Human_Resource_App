@@ -13,16 +13,14 @@ namespace Human_Resource_App.DAL.UsersRepository
             this.context = context;
         }
 
-        public List<User> AddEmployee(User user)
+        public User AddEmployee(User user)
         {
             if (user.Role == "TravelDeskExec")
                 user.CurrentGradeId = 1;
 
-                    context.Users.Add(user);
+                    var savedUser = context.Users.Add(user).Entity;
                    context.SaveChanges();
-
-                   var result = context.Users.ToList();
-                    return result;
+                    return savedUser;
         }
 
         public List<User> GetAllEmployee()

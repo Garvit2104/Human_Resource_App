@@ -2,7 +2,7 @@
 {
     public class UserRequestDTO
     {
-        //public int employee_id { get; set; }
+        public int employee_id { get; set; }
 
         public string? first_name { get; set; }
 

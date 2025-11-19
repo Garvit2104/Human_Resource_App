@@ -13,6 +13,6 @@
 
         public string? role { get; set; }
 
-        public int? current_grade_id { get; set; }
+        public string current_grade_id { get; set; }
     }
 }
