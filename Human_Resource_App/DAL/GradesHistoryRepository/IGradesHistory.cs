@@ -5,8 +5,9 @@ namespace Human_Resource_App.DAL.GradesHistoryRepository
 {
     public interface IGradesHistory
     {
-        public void saveGradeHistory(GradeHistory gradeHistory);
+        public void AddGradeHistory(GradeHistory gradeHistory);
 
+        List<GradeHistory> GetAllGradeHistoryByEmployeeId(int? id);
         public void DeleteAllGrades(int id);
     }
 }

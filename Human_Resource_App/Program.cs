@@ -14,17 +14,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<HRDbContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("HR_db")));
 
-builder.Services.AddDbContext<HRDbContext>(options =>
-options.UseSqlServer(builder.Configuration.GetConnectionString("HR_db")));
-
-
 builder.Services.AddScoped<IUserRepo, UserRepositoryClass>();
 builder.Services.AddScoped<IGradesRepo, GradesRepositoryClass>();
 builder.Services.AddScoped<IGradesHistory, GradesHistoryRepositoryClass>();
 
 builder.Services.AddScoped<IUserService, UserServiceClass>();
 builder.Services.AddScoped<IGradesService, GradesServiceClass>();
-
 
 
 builder.Services.AddControllers();

@@ -19,12 +19,15 @@ namespace Human_Resource_App.BLL.UserServices
             this.gradesHistoryRepo = gradesHistoryRepo;
             this.gradesRepo = gradesRepo;
         }
+        public class GradeUpdateRuleViolationException : Exception
+        {
+            public GradeUpdateRuleViolationException() : base("Grade Update Rule Violation Exception") { }
+        }
         public UserResponseDTO mapUserResponseToUserUserResponseDTO(User user)
         {
             
             Grade grade = gradesRepo.GetGradeById(user.CurrentGradeId.Value);
-
-            
+  
             return new UserResponseDTO
             {
                 employee_id = user.EmployeeId,
@@ -102,7 +105,8 @@ namespace Human_Resource_App.BLL.UserServices
             gradeHistoryEntity.EmployeeId = storeData.EmployeeId;
             gradeHistoryEntity.GradeId = storeData.CurrentGradeId;
 
-            gradesHistoryRepo.saveGradeHistory(gradeHistoryEntity);
+            gradesHistoryRepo.AddGradeHistory(gradeHistoryEntity);
+            
             
 
             // convert entity to DTO using mapper function
@@ -115,12 +119,52 @@ namespace Human_Resource_App.BLL.UserServices
             ValidateEmployee(userRequestDTO);
             var empData = userRepo.GetEmployeeById(id);
 
+            int? currentGrade = empData.CurrentGradeId;
+            int? newGrade = userRequestDTO.current_grade_id;
+
+            if(newGrade > currentGrade)
+                throw new Exception("Employee cannot be downgrade");
+
             empData.FirstName = userRequestDTO.first_name;
             empData.LastName = userRequestDTO.last_name;
             empData.PhoneNumber = userRequestDTO.phone_number;
             empData.EmailAddress = userRequestDTO.email_address;
             empData.Role = userRequestDTO.role;
             empData.CurrentGradeId = userRequestDTO.current_grade_id;
+
+            if(newGrade != currentGrade)
+            {
+                var gradeHistory = new GradeHistory
+                {
+                    AssignedOn = DateOnly.FromDateTime(DateTime.UtcNow),
+                    EmployeeId = empData.EmployeeId,
+                    GradeId = empData.CurrentGradeId
+                };
+
+                var gradeHistoryByEmployeeId = gradesHistoryRepo.GetAllGradeHistoryByEmployeeId(gradeHistory.EmployeeId);
+
+                GradeHistory prevGradeHistoryId = gradeHistoryByEmployeeId.First();
+                GradeHistory newGradeHistoryId = gradeHistoryByEmployeeId.Last();
+
+                var today = DateTime.Now;
+
+                var prevAssignedOn = prevGradeHistoryId.AssignedOn.GetValueOrDefault().ToDateTime(TimeOnly.MinValue);
+                var newAssignedOn = newGradeHistoryId.AssignedOn.GetValueOrDefault().ToDateTime(TimeOnly.MinValue);
+
+
+                if ((today - prevAssignedOn).TotalDays > (2 * 365))
+                {
+                    if ((today - newAssignedOn).TotalDays > 365)
+                    {
+                        gradesHistoryRepo.AddGradeHistory(gradeHistory);
+                    }
+                    else
+                        throw new GradeUpdateRuleViolationException();
+                }
+                else
+                    throw new GradeUpdateRuleViolationException();
+
+            }
 
             return mapUserResponseToUserUserResponseDTO(empData);
         }
