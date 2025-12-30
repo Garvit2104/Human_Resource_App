@@ -9,9 +9,9 @@ namespace Human_Resource_App.BLL.GradesService
                 {
                     this.gradesRepo = gradesRepo;        
                 }
-                public List<GradesResponseDTO>  GetAllGrades()
+                public async Task<IEnumerable<GradesResponseDTO>>  GetAllGrades()
                 {
-                    var result = gradesRepo.GetAllGrades();
+                    var result = await gradesRepo.GetAllGrades();
 
                     List<GradesResponseDTO> ls = new List<GradesResponseDTO>();
 

@@ -1,5 +1,6 @@
 ﻿using Human_Resource_App.Data;
 using Human_Resource_App.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Human_Resource_App.DAL.GradesRepository
 {
@@ -12,15 +13,19 @@ namespace Human_Resource_App.DAL.GradesRepository
             this.context = context;
         }
 
-        public List<Grade> GetAllGrades()
+        public async Task<IEnumerable<Grade>> GetAllGrades()
         { 
-            var data = context.Grades.ToList();
-            return data;
+            var data =  this.context.Grades.AsNoTracking().AsEnumerable();
+            return await Task.FromResult(data);
         }
 
-        public Grade GetGradeById(int id)
+        public async Task<Grade> GetGradeById(int id)
         {
-            var data = context.Grades.Find(id);
+            var data =  await context.Grades.FirstOrDefaultAsync(g => g.Id == id);
+
+            if (data == null)
+                throw new KeyNotFoundException($"Grade with id {id} not found.");
+
             return data;
         }
     }

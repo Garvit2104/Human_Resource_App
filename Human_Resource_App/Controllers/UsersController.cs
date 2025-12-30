@@ -1,10 +1,12 @@
 ﻿using Human_Resource_App.BLL.GradesService;
 using Human_Resource_App.BLL.UserServices;
 using Human_Resource_App.DAL.GradesHistoryRepository;
+using Human_Resource_App.DAL.UsersRepository;
 using Human_Resource_App.Data;
 using Human_Resource_App.DTOs.UsersDTO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using static Human_Resource_App.BLL.UserServices.UserServiceClass;
 
 namespace Human_Resource_App.Controllers
 {
@@ -15,60 +17,77 @@ namespace Human_Resource_App.Controllers
         private readonly IUserService userService;
         private readonly IGradesHistory gradeHistoryRepo;
         private readonly HRDbContext context;
-        public UsersController(IUserService userService, HRDbContext context, IGradesHistory gradeHistoryRepo)
+        private readonly IUserRepo _userRepo;
+        public UsersController(IUserService userService, HRDbContext context, IGradesHistory gradeHistoryRepo, IUserRepo _userRepo)
         {
             this.userService = userService;
             this.context = context;
+            this._userRepo = _userRepo;
             this.gradeHistoryRepo = gradeHistoryRepo;
         }
 
         [HttpPost("employee")]
-        public UserResponseDTO AddEmployee(UserRequestDTO userRequestDTO)
+        public async Task<IActionResult> AddEmployee(UserRequestDTO userRequestDTO)
         {
-            var result = userService.AddEmployee(userRequestDTO);
-            return result;
+            try
+            {
+                var result = await userService.AddEmployee(userRequestDTO);
+                return Ok();
+            }
+            catch(Exception ex)
+            {
+                return Problem(title: "Error", detail: ex.Message, statusCode: 400);
+            }
         }
 
-        [HttpGet("employess")]
+        [HttpGet("employee")]
 
-        public List<UserResponseDTO> GetAllEmployees()
+        public async Task<IActionResult> GetAllEmployees()
         {
-            var result = userService.GetAllEmployess();
-            return result;
+            try
+            {
+                var result = await userService.GetAllEmployess();
+                return Ok(result);
+
+            }
+            catch(Exception ex)
+            {
+                return Problem(title: "Error", detail: ex.Message, statusCode: 400);
+            }
         }
 
         [HttpGet("employee/{id}")]
 
-        public UserResponseDTO GetEmployeeById(int id)
+        public async Task<UserResponseDTO> GetEmployeeById(int id)
         {
-            var result = userService.GetEmployeeById(id);
+            var result = await userService.GetEmployeeById(id);
             return result;
         }
 
         [HttpDelete("employee/{id}")]
 
-        public IActionResult deleteEmployeeById(int id)
+        public async Task<IActionResult> DeleteEmployeeById(int id)
         {
-            var employee = context.Users.Find(id);
+             await _userRepo.DeleteEmployeeById(id);
 
-            if (employee == null)
-            {
-                return NotFound($"Employee with ID {id} not found.");
-            }
-            gradeHistoryRepo.DeleteAllGrades(id);
-
-            context.Users.Remove(employee);
-            context.SaveChanges();
             return Ok($"Employee with ID {id} deleted successfully.");
 
         }
 
-        [HttpPut("empoyeed/{id}")]
+        [HttpPut("employee/{id}")]
 
-        public UserResponseDTO updateEmployeeById(int id, UserRequestDTO userRequestDTO)
+        public async Task<IActionResult> updateEmployeeById(int id, UserRequestDTO userRequestDTO)
         {
-            var result = userService.updateEmployeeById(id, userRequestDTO);
-            return result;
+            try
+            {
+            var result = await userService.updateEmployeeById(id, userRequestDTO);
+            return NoContent();
+
+            }
+            catch (Exception ex)
+            { 
+                return Problem(title: "Error", detail: ex.Message, statusCode: 400); 
+            }
         }
     }
 }

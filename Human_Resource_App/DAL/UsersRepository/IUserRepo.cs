@@ -4,12 +4,14 @@ namespace Human_Resource_App.DAL.UsersRepository
 {
     public interface IUserRepo
     {
-        User AddEmployee(User user);
+        Task<User> AddEmployee(User user);
 
-        List<User> GetAllEmployee();
+        public Task<IEnumerable<User>> GetAllEmployee();
 
-        User GetEmployeeById(int employeeId);
+        Task<User> GetEmployeeById(int employeeId);
 
-        bool updateEmployeeById(User user);
+        Task<bool> updateEmployeeById(User user);
+
+        Task<Boolean> DeleteEmployeeById(int id);
     }
 }

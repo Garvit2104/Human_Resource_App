@@ -4,12 +4,12 @@ namespace Human_Resource_App.BLL.UserServices
 {
     public interface IUserService 
     {
-        UserResponseDTO AddEmployee(UserRequestDTO userRequestDTO);
+        Task<UserResponseDTO> AddEmployee(UserRequestDTO userRequestDTO);
 
-        List<UserResponseDTO> GetAllEmployess();
+        public Task<IEnumerable<UserResponseDTO>> GetAllEmployess();
 
-        UserResponseDTO GetEmployeeById(int employeeId);
+        Task<UserResponseDTO> GetEmployeeById(int employeeId);
 
-        UserResponseDTO updateEmployeeById(int id, UserRequestDTO userRequestDTO);
+        Task<UserResponseDTO> updateEmployeeById(int id, UserRequestDTO userRequestDTO);
     }
 }

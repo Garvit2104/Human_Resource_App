@@ -4,6 +4,6 @@ namespace Human_Resource_App.BLL.GradesService
 {
     public interface IGradesService
     {
-        List<GradesResponseDTO> GetAllGrades();
+        public  Task<IEnumerable<GradesResponseDTO>> GetAllGrades();
     }
 }

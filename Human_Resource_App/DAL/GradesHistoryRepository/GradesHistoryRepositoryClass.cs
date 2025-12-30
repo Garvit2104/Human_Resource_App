@@ -12,25 +12,20 @@ namespace Human_Resource_App.DAL.GradesHistoryRepository
         {
             this.context = context;
         }
-        public void AddGradeHistory(GradeHistory gradeHistory)
+        public async Task AddGradeHistory(GradeHistory gradeHistory)
         {
             context.GradeHistories.Add(gradeHistory);
-            context.SaveChanges();
+            await context.SaveChangesAsync();
         }
         
-        public List<GradeHistory> GetAllGradeHistoryByEmployeeId(int? id)
+        public async Task<IEnumerable<GradeHistory>> GetAllGradeHistoryByEmployeeId(int? id)
         {
-            var result = context.GradeHistories.Where(gh => gh.EmployeeId == id).ToList();
+            var result = this.context.GradeHistories.Where(gh => gh.EmployeeId == id).AsEnumerable();
 
-            return result;
+            return await Task.FromResult(result);
            
         }
-        public void DeleteAllGrades(int id)
-        {
-            var grades = context.GradeHistories.Where(g => g.EmployeeId == id).ToList();
-            context.GradeHistories.RemoveRange(grades);
-            context.SaveChanges();
-        }
+        
 
     }
 }

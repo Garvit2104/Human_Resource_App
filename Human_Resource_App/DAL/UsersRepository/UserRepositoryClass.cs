@@ -13,25 +13,25 @@ namespace Human_Resource_App.DAL.UsersRepository
             this.context = context;
         }
 
-        public User AddEmployee(User user)
+        public async Task<User> AddEmployee(User user)
         {
             if (user.Role == "TravelDeskExec")
                 user.CurrentGradeId = 1;
 
-                    var savedUser = context.Users.Add(user).Entity;
-                   context.SaveChanges();
-                    return savedUser;
+            var savedUser = await this.context.Users.AddAsync(user);
+            await this.context.SaveChangesAsync();
+            return savedUser.Entity;
         }
 
-        public List<User> GetAllEmployee()
+        public async Task<IEnumerable<User>> GetAllEmployee()
         {
-            var result = context.Users.ToList();
-            return result;
+            return await this.context.Users.Include(u=> u.CurrentGrade).AsNoTracking().ToListAsync();
+
         }
 
-        public User GetEmployeeById(int employeeId)
+        public async Task<User> GetEmployeeById(int employeeId)
         {
-            var empData = context.Users.FirstOrDefault(User => User.EmployeeId == employeeId);
+            var empData = await context.Users.Include(u=> u.CurrentGrade).FirstOrDefaultAsync(User => User.EmployeeId == employeeId);
 
             if(empData == null)
             {
@@ -41,16 +41,32 @@ namespace Human_Resource_App.DAL.UsersRepository
             return empData;
         }
 
-        public bool updateEmployeeById(User user)
+        public async Task<bool> updateEmployeeById(User user)
         {
             if (user != null)
             {
                 context.Entry(user).State = EntityState.Modified;
-                 context.SaveChanges();
+                await context.SaveChangesAsync();
                 return true;
             }
             return false;
+        }
 
+        public async Task<Boolean> DeleteEmployeeById(int id)
+        {
+           var employee = await context.Users.FirstOrDefaultAsync(u => u.EmployeeId == id);
+
+            if(employee != null)
+            {
+                var result = context.GradeHistories.Where(u => u.EmployeeId == id);
+
+                context.GradeHistories.RemoveRange(result);
+                context.Users.Remove(employee);
+                await context.SaveChangesAsync();
+                return true;
+
+            }
+            return false;
 
         }
     }

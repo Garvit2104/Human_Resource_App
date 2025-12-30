@@ -18,10 +18,18 @@ namespace Human_Resource_App.Controllers
 
         [HttpGet("grades")]
 
-        public List<GradesResponseDTO> GetAllGrades()
+        public async Task<IActionResult> GetAllGrades()
         {
-            var grades = gradesService.GetAllGrades();
-            return grades;
+            try
+            {
+                var grades = await gradesService.GetAllGrades();
+                return Ok(grades);
+
+            }
+            catch(Exception ex)
+            {
+                return Problem(title: "Error", detail: ex.Message, statusCode: 400);
+            }
 
         }
     }
