@@ -23,12 +23,14 @@ namespace Human_Resource_App.Controllers
             try
             {
                 var grades = await gradesService.GetAllGrades();
+                if(grades == null || !grades.Any())
+                    return NotFound("No Grades Found");
                 return Ok(grades);
 
             }
             catch(Exception ex)
             {
-                return Problem(title: "Error", detail: ex.Message, statusCode: 400);
+                return Problem(title: "Error Fetching in Grades", detail: ex.Message, statusCode: 400);
             }
 
         }

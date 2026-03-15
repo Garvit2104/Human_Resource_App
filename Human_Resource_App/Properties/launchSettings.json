@@ -1,33 +1,24 @@
-﻿{
-  "$schema": "http://json.schemastore.org/launchsettings.json",
-  "iisSettings": {
-    "windowsAuthentication": false,
-    "anonymousAuthentication": true,
-    "iisExpress": {
-      "applicationUrl": "http://localhost:52489",
-      "sslPort": 44329
-    }
-  },
+{
   "profiles": {
     "http": {
       "commandName": "Project",
-      "dotnetRunMessages": true,
+      "workingDirectory": "C:\\Users\\2309580\\source\\repos\\Human_Resource_App\\Human_Resource_App",
       "launchBrowser": true,
       "launchUrl": "swagger",
-      "applicationUrl": "http://localhost:5238",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+      },
+      "dotnetRunMessages": true,
+      "applicationUrl": "http://localhost:5238"
     },
     "https": {
       "commandName": "Project",
-      "dotnetRunMessages": true,
+      "workingDirectory": "C:\\Users\\2309580\\source\\repos\\Human_Resource_App\\Human_Resource_App",
       "launchBrowser": true,
       "launchUrl": "swagger",
+      "dotnetRunMessages": true,
       "applicationUrl": "https://localhost:7260;http://localhost:5238",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+      "remoteDebugEnabled": false
     },
     "IIS Express": {
       "commandName": "IISExpress",
@@ -36,6 +27,15 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
+    }
+  },
+  "$schema": "http://json.schemastore.org/launchsettings.json",
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iisExpress": {
+      "applicationUrl": "http://localhost:52489",
+      "sslPort": 44329
     }
   }
 }

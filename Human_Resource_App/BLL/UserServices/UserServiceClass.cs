@@ -65,49 +65,61 @@ namespace Human_Resource_App.BLL.UserServices
             {
                 throw new ArgumentException("Email address must be in the format xxxx@cognizant.com");
             }
+
+            if (string.IsNullOrWhiteSpace(userRequestDTO.phone_number) ||
+                userRequestDTO.phone_number.Length != 10 || !userRequestDTO.phone_number.All(char.IsDigit))
+            {
+                throw new ArgumentException("Phone Number must be 10 digit");
+            }
+
+            var validRoles = new[] { "Employee", "HR", "TravelDeskExe" };
+            if (!validRoles.Contains(userRequestDTO.role)) 
+            {
+                throw new ArgumentException("Role must be Employee, HR or TravelDeskExe");
+            }
         }
 
         public async Task<IEnumerable<UserResponseDTO>> GetAllEmployess()
         {
             var result = await userRepo.GetAllEmployee();
-            List<UserResponseDTO> ls = new List<UserResponseDTO>();
+            List<UserResponseDTO> usersList = new List<UserResponseDTO>();
 
             foreach(var item in result)
             {
-                ls.Add(await MapEntityResponseToUserResponseDTO(item));
+                usersList.Add(await MapEntityResponseToUserResponseDTO(item));
             }
-            return ls;
+            return usersList;
         }
 
         public async Task<UserResponseDTO> GetEmployeeById(int employeeId)
         {
             var empData =  await userRepo.GetEmployeeById(employeeId);
-            //List<UserResponseDTO> ls = new List<UserResponseDTO>();
-
+            
             return await MapEntityResponseToUserResponseDTO(empData); 
         }
 
         public async Task<UserResponseDTO> AddEmployee(UserRequestDTO userRequestDTO)
         {
             ValidateEmployee(userRequestDTO);
+
             var userEntity = MapUserRequestDTOtoEntity(userRequestDTO); // from mapper function
 
-            if (userEntity.Role.Equals("TravelDeskExec", StringComparison.OrdinalIgnoreCase))
+            if (userEntity.Role.Equals("TravelDeskExe", StringComparison.OrdinalIgnoreCase))
             {
                 userEntity.CurrentGradeId = 1;
             }
 
-            var storeData = await userRepo.AddEmployee(userEntity);        // save to db
-                
-            GradeHistory gradeHistoryEntity = new GradeHistory();
-            gradeHistoryEntity.AssignedOn = DateOnly.FromDateTime(DateTime.UtcNow);
-            gradeHistoryEntity.EmployeeId = storeData.EmployeeId;
-            gradeHistoryEntity.GradeId = storeData.CurrentGradeId;
+            var savedUser = await userRepo.AddEmployee(userEntity);        // save to db
+
+            var gradeHistoryEntity = new GradeHistory
+            {
+                AssignedOn = DateOnly.FromDateTime(DateTime.UtcNow),
+                EmployeeId = savedUser.EmployeeId,
+                GradeId = savedUser.CurrentGradeId
+            };
 
             await gradesHistoryRepo.AddGradeHistory(gradeHistoryEntity);
-            
-            
-
+          
             // convert entity to DTO using mapper function
             return await MapEntityResponseToUserResponseDTO(userEntity);
 

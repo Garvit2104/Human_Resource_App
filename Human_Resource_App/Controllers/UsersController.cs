@@ -27,12 +27,15 @@ namespace Human_Resource_App.Controllers
         }
 
         [HttpPost("employee")]
-        public async Task<IActionResult> AddEmployee(UserRequestDTO userRequestDTO)
+        public async Task<ActionResult<UserResponseDTO>> AddEmployee(UserRequestDTO userRequestDTO)
         {
             try
             {
+                if (userRequestDTO == null)
+                    return BadRequest("Employee Data cannot be null");
+
                 var result = await userService.AddEmployee(userRequestDTO);
-                return Ok();
+                return StatusCode(201, result);
             }
             catch(Exception ex)
             {
@@ -40,53 +43,88 @@ namespace Human_Resource_App.Controllers
             }
         }
 
-        [HttpGet("employee")]
+        [HttpGet("employees")]
 
-        public async Task<IActionResult> GetAllEmployees()
+        public async Task<ActionResult<UserResponseDTO>> GetAllEmployees()
         {
             try
             {
                 var result = await userService.GetAllEmployess();
+                if (result == null || !result.Any())
+                    return NotFound("No Employee Found");
+
                 return Ok(result);
 
             }
             catch(Exception ex)
             {
-                return Problem(title: "Error", detail: ex.Message, statusCode: 400);
+                return Problem(title: "Error Fetching Employees", detail: ex.Message, statusCode: 400);
             }
         }
 
-        [HttpGet("employee/{id}")]
+        [HttpGet("employees/{id}")]
 
-        public async Task<UserResponseDTO> GetEmployeeById(int id)
-        {
-            var result = await userService.GetEmployeeById(id);
-            return result;
-        }
-
-        [HttpDelete("employee/{id}")]
-
-        public async Task<IActionResult> DeleteEmployeeById(int id)
-        {
-             await _userRepo.DeleteEmployeeById(id);
-
-            return Ok($"Employee with ID {id} deleted successfully.");
-
-        }
-
-        [HttpPut("employee/{id}")]
-
-        public async Task<IActionResult> updateEmployeeById(int id, UserRequestDTO userRequestDTO)
+        public async Task<ActionResult<UserResponseDTO>> GetEmployeeById(int id)
         {
             try
             {
-            var result = await userService.updateEmployeeById(id, userRequestDTO);
-            return NoContent();
+                if(id <= 0)
+                {
+                    return BadRequest("Invalid Employee Id");
+                }
+            var result = await userService.GetEmployeeById(id);
+            return Ok(result);
+            }
+            catch(Exception ex)
+            {
+                return Problem(title: "Error Fetching Employee", detail: ex.Message, statusCode: 400);
+            }
+        }
+
+        [HttpDelete("employees/{id}")]
+
+        public async Task<IActionResult> DeleteEmployeeById(int id)
+        {
+            try
+            {
+                if (id <= 0)
+                {
+                    return BadRequest("Invalid Employee Id");
+                }
+
+                await _userRepo.DeleteEmployeeById(id);
+
+               return Ok($"Employee with ID {id} deleted successfully.");
+                
+            }
+            catch(Exception ex)
+            {
+                return Problem(title: "Error Deleting Employee", detail: ex.Message, statusCode: 400);
+            }
+        }
+
+        [HttpPut("employees/{id}")]
+
+        public async Task<ActionResult<UserResponseDTO>> updateEmployeeById(int id, UserRequestDTO userRequestDTO)
+        {
+            try
+            {
+                if (id <= 0)
+                {
+                    return BadRequest("Invalid Employee Id");
+                }
+                if (userRequestDTO == null)
+                {
+                    return BadRequest("Employee Data cannot be null");
+                }
+
+             var result = await userService.updateEmployeeById(id, userRequestDTO);
+            return Ok(result);
 
             }
             catch (Exception ex)
             { 
-                return Problem(title: "Error", detail: ex.Message, statusCode: 400); 
+                return Problem(title: "Error updating Status", detail: ex.Message, statusCode: 400); 
             }
         }
     }
